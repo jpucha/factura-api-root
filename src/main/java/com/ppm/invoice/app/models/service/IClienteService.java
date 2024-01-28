@@ -15,7 +15,9 @@ public interface IClienteService {
 	
 	public Page<Cliente> findAll(Pageable pageable);
 
-	public void save(Cliente cliente);
+	public Cliente findById(Long id);
+
+	public Cliente save(Cliente cliente);
 	
 	public Cliente findOne(Long id);
 	

@@ -36,8 +36,8 @@ public class ClienteServiceImpl implements IClienteService{
 
 	@Override
 	@Transactional
-	public void save(Cliente cliente) {
-		clienteDao.save(cliente);
+	public Cliente save(Cliente cliente) {
+		return clienteDao.save(cliente);
 	}
 
 	@Override
@@ -62,6 +62,12 @@ public class ClienteServiceImpl implements IClienteService{
 	@Transactional(readOnly = true)
 	public Page<Cliente> findAll(Pageable pageable) {
 		return clienteDao.findAll(pageable);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Cliente findById(Long id) {
+		return clienteDao.findById(id).orElse(null);
 	}
 
 	@Override
