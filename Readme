@@ -1,0 +1,16 @@
+Antecedentes
+El proyecto está pensado para desplegar como un jar de forma independiente teniendo para esto el servidor de tomcat embebido, por lo que al construir se generara un jar.
+Utilizando maven en su version 3.8.6.
+
+Primeros pasos
+Clonar el proyecto invoice-api-root de https://github.com/jpucha/invoice-api-root
+
+Ejecutar mvn clean package para contruir en windows,.
+
+Para ejecutar de forma local, abrir un cmd en la ruta ..\invoice-api-root\target
+Ejecutar:
+ 1. `java -jar invoice-api-root-0.0.1-SNAPSHOT.jar`
+
+
+
+

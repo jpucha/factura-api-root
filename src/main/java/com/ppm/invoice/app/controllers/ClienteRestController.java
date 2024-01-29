@@ -4,13 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import com.ppm.invoice.app.models.entity.Cliente;
 import com.ppm.invoice.app.models.service.IClienteService;
-import com.ppm.invoice.app.view.xml.ClienteList;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +25,22 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 
+/**
+ * ClienteRestController specification
+ */
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RestController
 @RequestMapping("invoiceApiServices/api/v1/clientes")
 public class ClienteRestController {
+
+    protected final Log logger = LogFactory.getLog(this.getClass());
+
+    public static final String RESTYP = "restyp";
+    public static final String RESTYP_SUCCESS = "SUCCESS";
+    public static final String RESTYP_ERROR = "ERROR";
+    public static final String RESTYP_INFO = "INFO";
+    public static final String RESTYP_MES = "mes";
 
     @Autowired
     private IClienteService clienteService;
@@ -161,5 +175,20 @@ public class ClienteRestController {
         response.put("mensaje", "El cliente eliminado con éxito!");
 
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping(value = "/ver/{id}")
+    public Cliente ver(@PathVariable(value = "id") Long id, HttpServletResponse response)
+        throws Exception {
+
+        Cliente cliente = clienteService.fetchByIdWithFacturas(id);
+        if (cliente == null) {
+            response.setHeader(RESTYP, RESTYP_ERROR);
+            logger.error("Facturas no encontradas para el cliente dado.");
+            return null;
+        }
+
+        return cliente;
     }
 }

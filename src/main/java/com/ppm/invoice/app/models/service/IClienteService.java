@@ -1,40 +1,77 @@
 package com.ppm.invoice.app.models.service;
 
 import java.util.List;
-
+import com.ppm.invoice.app.models.entity.Cliente;
+import com.ppm.invoice.app.models.entity.Producto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.ppm.invoice.app.models.entity.Cliente;
-import com.ppm.invoice.app.models.entity.Factura;
-import com.ppm.invoice.app.models.entity.Producto;
-
+/**
+ * IClienteService specification.
+ */
 public interface IClienteService {
 
-	public List<Cliente> findAll();
-	
-	public Page<Cliente> findAll(Pageable pageable);
+    /**
+     * Find all.
+     * @return
+     */
+    List<Cliente> findAll();
 
-	public Cliente findById(Long id);
+    /**
+     * Find all.
+     * @param pageable
+     * @return
+     */
+    Page<Cliente> findAll(Pageable pageable);
 
-	public Cliente save(Cliente cliente);
-	
-	public Cliente findOne(Long id);
-	
-	public Cliente fetchByIdWithFacturas(Long id);
-	
-	public void delete(Long id);
-	
-	public List<Producto> findByNombre(String term);
-	
-	public void saveFactura(Factura factura);
-	
-	public Producto findProductoById(Long id);
-	
-	public Factura findFacturaById(Long id);
-	
-	public void deleteFactura(Long id);
-	
-	public Factura fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(Long id);
+    /**
+     * findById.
+     * @param id
+     * @return
+     */
+    Cliente findById(Long id);
+
+    /**
+     * Save.
+     * @param cliente
+     * @return
+     */
+    Cliente save(Cliente cliente);
+
+    /**
+     * findOne
+     * @param id
+     * @return
+     */
+    Cliente findOne(Long id);
+
+    /**
+     * fetchByIdWithFacturas
+     * @param id
+     * @return
+     */
+    Cliente fetchByIdWithFacturas(Long id);
+
+    /**
+     * delete.
+     * @param id
+     */
+    void delete(Long id);
+
+    /**
+     * findByNombre
+     * @param term
+     * @return
+     */
+    List<Producto> findByNombre(String term);
+
+
+    /**
+     * findProductoById.
+     * @param id
+     * @return
+     */
+    Producto findProductoById(Long id);
+
 
 }

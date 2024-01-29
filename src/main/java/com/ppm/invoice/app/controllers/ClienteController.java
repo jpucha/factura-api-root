@@ -48,6 +48,9 @@ import com.ppm.invoice.app.models.service.IUploadFileService;
 import com.ppm.invoice.app.util.paginator.PageRender;
 import com.ppm.invoice.app.view.xml.ClienteList;
 
+/**
+ * ClienteController specification.
+ */
 @Controller
 @SessionAttributes("cliente")
 public class ClienteController {

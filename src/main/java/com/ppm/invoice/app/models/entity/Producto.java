@@ -25,6 +25,8 @@ public class Producto implements Serializable {
 
 	private Double precio;
 
+	private String Proveedor;
+
 	@Temporal(TemporalType.DATE)
 	@Column(name = "create_at")
 	private Date createAt;
@@ -64,6 +66,14 @@ public class Producto implements Serializable {
 
 	public void setCreateAt(Date createAt) {
 		this.createAt = createAt;
+	}
+
+	public String getProveedor() {
+		return Proveedor;
+	}
+
+	public void setProveedor(String proveedor) {
+		Proveedor = proveedor;
 	}
 
 	private static final long serialVersionUID = 1L;

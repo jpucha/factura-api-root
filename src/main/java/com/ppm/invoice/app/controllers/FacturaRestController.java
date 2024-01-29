@@ -2,16 +2,17 @@ package com.ppm.invoice.app.controllers;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.ppm.invoice.app.models.service.IInvoiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -30,53 +31,56 @@ import com.ppm.invoice.app.models.entity.DetalleFactura;
 import com.ppm.invoice.app.models.entity.Producto;
 import com.ppm.invoice.app.models.service.IClienteService;
 
+/**
+ * FacturaRestController specification.
+ */
 @Secured("ROLE_ADMIN")
-@Controller
-@RequestMapping("/factura")
-@SessionAttributes("factura")
-public class FacturaController {
+@RestController
+@RequestMapping("invoiceApiServices/api/v1/invoice")
+//@SessionAttributes("factura")
+public class FacturaRestController {
 
 	@Autowired
 	private IClienteService clienteService;
 
+	private IInvoiceService iInvoiceService;
+
+
 	private final Logger log = LoggerFactory.getLogger(getClass());
+	public static final String RESTYP = "restyp";
+	public static final String RESTYP_SUCCESS = "SUCCESS";
+	public static final String RESTYP_ERROR = "ERROR";
+	public static final String RESTYP_INFO = "INFO";
+	public static final String RESTYP_MES = "mes";
 	
 	@Autowired
 	private MessageSource messageSource;
 
-	@GetMapping("/ver/{id}")
-	public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash, Locale locale) {
+	@GetMapping(path="/getInvoiceByIdWithClientWhithItemInvoiceWithProduct/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Factura getInvoiceByIdWithClientWhithItemInvoiceWithProduct(@PathVariable(value = "id") Long id, HttpServletResponse response) {
 
-		Factura factura = clienteService.fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(id); // clienteService.findFacturaById(id);
+		Factura factura = this.iInvoiceService.fetchInvoiceByIdWithClientWhithItemInvoiceWithProduct(id); // clienteService.findFacturaById(id);
 
 		if (factura == null) {
-			flash.addFlashAttribute("error", messageSource.getMessage("text.factura.flash.db.error", null, locale));
-			return "redirect:/listar";
+			response.setHeader(RESTYP, RESTYP_ERROR);
+			factura = new Factura();
 		}
-
-		model.addAttribute("factura", factura);
-		model.addAttribute("titulo", String.format(messageSource.getMessage("text.factura.ver.titulo", null, locale), factura.getDescripcion()));
-		return "factura/ver";
+		response.setHeader(RESTYP, RESTYP_SUCCESS);
+		return factura;
 	}
 
 	@GetMapping("/form/{clienteId}")
-	public String crear(@PathVariable(value = "clienteId") Long clienteId, Map<String, Object> model,
-			RedirectAttributes flash, Locale locale) {
+	public Cliente crear(@PathVariable(value = "clienteId") Long clienteId, HttpServletResponse response)
+		throws Exception {
 
+		//get cliente
 		Cliente cliente = clienteService.findOne(clienteId);
 
 		if (cliente == null) {
-			flash.addFlashAttribute("error", messageSource.getMessage("text.cliente.flash.db.error", null, locale));
-			return "redirect:/listar";
+			response.setHeader(RESTYP, RESTYP_ERROR);
+			throw new Exception("Cliente no encontrado, no se puede crear una factura.");
 		}
-
-		Factura factura = new Factura();
-		factura.setCliente(cliente);
-
-		model.put("factura", factura);
-		model.put("titulo", messageSource.getMessage("text.factura.form.titulo", null, locale));
-
-		return "factura/form";
+		return cliente;
 	}
 
 	@GetMapping(value = "/cargar-productos/{term}", produces = { "application/json" })
@@ -112,7 +116,7 @@ public class FacturaController {
 			log.info("ID: " + itemId[i].toString() + ", cantidad: " + cantidad[i].toString());
 		}
 
-		clienteService.saveFactura(factura);
+		iInvoiceService.saveInvoice(factura);
 		status.setComplete();
 
 		flash.addFlashAttribute("success", messageSource.getMessage("text.factura.flash.crear.success", null, locale));
@@ -123,10 +127,10 @@ public class FacturaController {
 	@GetMapping("/eliminar/{id}")
 	public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash, Locale locale) {
 
-		Factura factura = clienteService.findFacturaById(id);
+		Factura factura = iInvoiceService.findInvoiceById(id);
 
 		if (factura != null) {
-			clienteService.deleteFactura(id);
+			iInvoiceService.deleteInvoice(id);
 			flash.addFlashAttribute("success", messageSource.getMessage("text.factura.flash.eliminar.success", null, locale));
 			return "redirect:/ver/" + factura.getCliente().getId();
 		}
